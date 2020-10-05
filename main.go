@@ -2,24 +2,27 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/Allegan/wit/pkg/config"
 )
 
 func main() {
-	var err error
+	conf := &config.Config{}
+	action := &config.Action{}
 
-	defer func() {
-		if err != nil {
-			errMsg := fmt.Errorf("[FATAL]%w", err)
-			fmt.Println(errMsg)
-		}
-	}()
-
-	flags, err := config.New()
+	// read config from file
+	conf, err := conf.ReadFromFile("./.witrc")
 	if err != nil {
-		return
+		log.Fatalln(fmt.Errorf("Quitting wit: \n\t%w", err))
+		os.Exit(1)
 	}
 
-	fmt.Printf("%v\n", flags.Host)
+	// parse action from command line
+	action, err = action.ParseCommandLine()
+	if err != nil {
+		log.Fatalln(fmt.Errorf("Quitting wit: \n\t%w", err))
+		os.Exit(1)
+	}
 }
